@@ -14,13 +14,12 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.sunlife.poc.boogle.constants.Constants;
-import ca.sunlife.poc.boogle.exception.FatalException;
 import ca.sunlife.poc.boogle.exception.BoogleException;
+import ca.sunlife.poc.boogle.exception.FatalException;
 import ca.sunlife.poc.boogle.response.QueryResponse;
-import ca.sunlife.poc.boogle.response.SearchResponse;
 import ca.sunlife.poc.boogle.response.confluence.ConfluenceResponse;
-import ca.sunlife.poc.boogle.util.SearchResponseMapper;
 import ca.sunlife.poc.boogle.util.BoogleUtil;
+import ca.sunlife.poc.boogle.util.SearchResponseMapper;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -39,7 +38,7 @@ public class ConfluenceSearchService implements IConfluenceSearchService {
 	IConfluenceAuthService confluenceAuthService;
 
 	@Override
-	public SearchResponse searchConfluenceQuery(String query, int page, int pageSize) {
+	public List<QueryResponse> searchConfluenceQuery(String query, int page, int pageSize) {
 
 		String accessToken = confluenceAuthService.fetchOAuthToken().getAccess_token();
 		if (StringUtils.isEmpty(accessToken)) {
@@ -60,9 +59,7 @@ public class ConfluenceSearchService implements IConfluenceSearchService {
 		}
 		List<QueryResponse> queryResponses = SearchResponseMapper.mapConfluenceResponse(confluenceResponse);
 
-		SearchResponse searchResponse = new SearchResponse();
-		searchResponse.setQueryResponses(queryResponses);
-		return searchResponse;
+		return queryResponses;
 
 	}
 

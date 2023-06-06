@@ -14,17 +14,16 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.sunlife.poc.boogle.constants.Constants;
-import ca.sunlife.poc.boogle.exception.FatalException;
 import ca.sunlife.poc.boogle.exception.BoogleException;
+import ca.sunlife.poc.boogle.exception.FatalException;
 import ca.sunlife.poc.boogle.response.QueryResponse;
-import ca.sunlife.poc.boogle.response.SearchResponse;
 import ca.sunlife.poc.boogle.response.sharepoint.GraphqlResponse;
 import ca.sunlife.poc.boogle.response.sharepoint.SharepointResponse;
 import ca.sunlife.poc.boogle.sharepoint.request.GraphqlRequest;
 import ca.sunlife.poc.boogle.sharepoint.request.Query;
 import ca.sunlife.poc.boogle.sharepoint.request.Requests;
-import ca.sunlife.poc.boogle.util.SearchResponseMapper;
 import ca.sunlife.poc.boogle.util.BoogleUtil;
+import ca.sunlife.poc.boogle.util.SearchResponseMapper;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -59,7 +58,7 @@ public class SharepointSearchService implements ISharepointSearchService {
 	ISharepointAuthService sharepointAuthService;
 
 	@Override
-	public SearchResponse searchSharepointQuery(String query, int page, int pageSize) {
+	public List<QueryResponse> searchSharepointQuery(String query, int page, int pageSize) {
 
 		String accessToken = sharepointAuthService.fetchOAuthToken();
 		if (StringUtils.isEmpty(accessToken)) {
@@ -84,15 +83,12 @@ public class SharepointSearchService implements ISharepointSearchService {
 		}
 
 		List<QueryResponse> queryResponses = SearchResponseMapper.mapSharepointResponse(sharepointResponse);
-
-		SearchResponse searchResponse = new SearchResponse();
-		searchResponse.setQueryResponses(queryResponses);
-		return searchResponse;
+		return queryResponses;
 
 	}
 
 	@Override
-	public SearchResponse searchQueryUsingGraphql(String query, int page, int pageSize) {
+	public List<QueryResponse> searchQueryUsingGraphql(String query, int page, int pageSize) {
 		String accessToken = sharepointAuthService.fetchOAuthTokenByClientCredentials().getAccess_token();
 		if (StringUtils.isEmpty(accessToken)) {
 			throw new FatalException(env.getProperty("GENERIC_ERROR_MESSAGE"));
@@ -112,9 +108,7 @@ public class SharepointSearchService implements ISharepointSearchService {
 
 			throw new BoogleException(env.getProperty("NO_RECORD"), Constants.NO_RECORD_FOUND);
 		}
-		SearchResponse searchResponse = new SearchResponse();
-		searchResponse.setQueryResponses(queryResponses);
-		return searchResponse;
+		return queryResponses;
 
 	}
 

@@ -1,5 +1,7 @@
 package ca.sunlife.poc.boogle.rest;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -12,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ca.sunlife.poc.boogle.confluence.service.IConfluenceSearchService;
 import ca.sunlife.poc.boogle.constants.Constants;
-import ca.sunlife.poc.boogle.exception.FatalException;
 import ca.sunlife.poc.boogle.exception.BoogleException;
+import ca.sunlife.poc.boogle.exception.FatalException;
+import ca.sunlife.poc.boogle.response.QueryResponse;
 import ca.sunlife.poc.boogle.response.ResponseDto;
-import ca.sunlife.poc.boogle.response.SearchResponse;
 import ca.sunlife.poc.boogle.sharepoint.service.ISharepointSearchService;
 import ca.sunlife.poc.boogle.util.BoogleUtil;
 
@@ -44,7 +46,7 @@ public class BoogleRestController {
 					Constants.QUERY_BLANK, env.getProperty("NOT_BLANK"), null), HttpStatus.BAD_REQUEST);
 		}
 
-		SearchResponse searchResponse = sharepointSearchService.searchSharepointQuery(queryText, page, size);
+		List<QueryResponse> searchResponse = sharepointSearchService.searchSharepointQuery(queryText, page, size);
 		ResponseDto<Object> resp = BoogleUtil.mapResponse(Constants.SUCCESSFUL, null, null, searchResponse);
 		return new ResponseEntity<>(resp, HttpStatus.OK);
 	}
@@ -60,7 +62,7 @@ public class BoogleRestController {
 					Constants.QUERY_BLANK, env.getProperty("NOT_BLANK"), null), HttpStatus.BAD_REQUEST);
 		}
 
-		SearchResponse searchResponse = sharepointSearchService.searchQueryUsingGraphql(queryText, page, size);
+		List<QueryResponse> searchResponse = sharepointSearchService.searchQueryUsingGraphql(queryText, page, size);
 		ResponseDto<Object> resp = BoogleUtil.mapResponse(Constants.SUCCESSFUL, null, null, searchResponse);
 		return new ResponseEntity<>(resp, HttpStatus.OK);
 	}
@@ -75,7 +77,7 @@ public class BoogleRestController {
 			return new ResponseEntity<ResponseDto<Object>>(BoogleUtil.mapResponse(Constants.FAILURE,
 					Constants.QUERY_BLANK, env.getProperty("NOT_BLANK"), null), HttpStatus.BAD_REQUEST);
 		}
-		SearchResponse searchResponse = confluenceSearchService.searchConfluenceQuery(queryText, page, size);
+		List<QueryResponse> searchResponse = confluenceSearchService.searchConfluenceQuery(queryText, page, size);
 		ResponseDto<Object> resp = BoogleUtil.mapResponse(Constants.SUCCESSFUL, null, null, searchResponse);
 		return new ResponseEntity<>(resp, HttpStatus.OK);
 	}

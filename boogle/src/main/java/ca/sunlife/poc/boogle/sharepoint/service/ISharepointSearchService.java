@@ -1,11 +1,13 @@
 package ca.sunlife.poc.boogle.sharepoint.service;
 
-import ca.sunlife.poc.boogle.response.SearchResponse;
+import java.util.List;
+
+import ca.sunlife.poc.boogle.response.QueryResponse;
 
 public interface ISharepointSearchService {
 
-	public SearchResponse searchSharepointQuery(String query, int page, int pageSize);
+	public List<QueryResponse> searchSharepointQuery(String query, int page, int pageSize);
 
-	public SearchResponse searchQueryUsingGraphql(String query, int page, int pageSize);
+	public List<QueryResponse> searchQueryUsingGraphql(String query, int page, int pageSize);
 
 }
