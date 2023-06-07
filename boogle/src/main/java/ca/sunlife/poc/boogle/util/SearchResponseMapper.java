@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.util.CollectionUtils;
+
 import ca.sunlife.poc.boogle.constants.Constants;
 import ca.sunlife.poc.boogle.response.QueryResponse;
 import ca.sunlife.poc.boogle.response.confluence.ConfluenceResponse;
@@ -37,10 +39,13 @@ public class SearchResponseMapper {
 
 	public static List<QueryResponse> mapGraphqlResponse(GraphqlResponse graphqlResponse) {
 		List<QueryResponse> queryResponses = new ArrayList<>();
-		queryResponses = graphqlResponse.getValue().stream()
-				.flatMap(hitcontainers -> hitcontainers.getHitsContainers().stream())
-				.flatMap(hits -> hits.getHits().stream()).map(hit -> setGraphqlResponse(hit))
-				.collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(graphqlResponse.getValue())) {
+			queryResponses = graphqlResponse.getValue().stream()
+					.filter(y -> !CollectionUtils.isEmpty(y.getHitsContainers()))
+					.flatMap(hitcontainers -> hitcontainers.getHitsContainers().stream())
+					.filter(x -> !CollectionUtils.isEmpty(x.getHits())).flatMap(hits -> hits.getHits().stream())
+					.map(hit -> setGraphqlResponse(hit)).collect(Collectors.toList());
+		}
 		return queryResponses;
 	}
 
@@ -81,8 +86,7 @@ public class SearchResponseMapper {
 		QueryResponse queryResponse = new QueryResponse();
 		queryResponse.setTitle(result.getTitle());
 		queryResponse.setParentPageName(result.getSpace().getName());
-		queryResponse
-				.setParentPagePath(BoogleUtil.createUrl(links.getBase(), result.getSpace().getLinks().getWebui()));
+		queryResponse.setParentPagePath(BoogleUtil.createUrl(links.getBase(), result.getSpace().getLinks().getWebui()));
 		queryResponse.setPath(BoogleUtil.createUrl(links.getBase(), result.getLinks().getWebui()));
 		queryResponse.setSummary(BoogleUtil.parseHtml(result.getBody().getView().getValue()));
 		if (result.getType().equals(Constants.ATTACHMENT)) {
@@ -105,15 +109,13 @@ public class SearchResponseMapper {
 			queryResponse.setPath(fields.getPath());
 			queryResponse.setFileType(fields.getFileType());
 			queryResponse.setParentPagePath(fields.getSiteName());
-			queryResponse.setParentPageName(BoogleUtil.getLastValue(fields.getSiteName(),Constants.SLASH));
-		}
-		else {
+			queryResponse.setParentPageName(BoogleUtil.getLastValue(fields.getSiteName(), Constants.SLASH));
+		} else {
 			queryResponse.setTitle(resource.getName());
 			queryResponse.setPath(resource.getWebUrl());
 			queryResponse.setParentPagePath(resource.getWebUrl());
-			queryResponse.setParentPageName(BoogleUtil.getLastValue(resource.getWebUrl(),Constants.SLASH));
+			queryResponse.setParentPageName(BoogleUtil.getLastValue(resource.getWebUrl(), Constants.SLASH));
 
-			
 		}
 
 		return queryResponse;

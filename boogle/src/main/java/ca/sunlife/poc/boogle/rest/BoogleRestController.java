@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,53 +34,35 @@ public class BoogleRestController {
 
 	@Autowired
 	Environment env;
-	
 
 	@GetMapping(value = "${boogle.sharepoint.search.url}")
-	public ResponseEntity<ResponseDto<Object>> searchSharepointQuery(
+	public ResponseEntity<List<QueryResponse>> searchSharepointQuery(
 			@RequestParam(required = true, name = "query") String queryText,
 			@RequestParam(required = true, name = "page", defaultValue = "1") int page,
 			@RequestParam(required = true, name = "size", defaultValue = "25") int size) throws FatalException {
 
-		if (StringUtils.isEmpty(queryText)) {
-			return new ResponseEntity<ResponseDto<Object>>(BoogleUtil.mapResponse(Constants.FAILURE,
-					Constants.QUERY_BLANK, env.getProperty("NOT_BLANK"), null), HttpStatus.BAD_REQUEST);
-		}
-
-		List<QueryResponse> searchResponse = sharepointSearchService.searchSharepointQuery(queryText, page, size);
-		ResponseDto<Object> resp = BoogleUtil.mapResponse(Constants.SUCCESSFUL, null, null, searchResponse);
-		return new ResponseEntity<>(resp, HttpStatus.OK);
+		List<QueryResponse> queryResponses = sharepointSearchService.searchSharepointQuery(queryText, page, size);
+		return new ResponseEntity<>(queryResponses, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "${boogle.sharepoint.graphql.search.url}")
-	public ResponseEntity<ResponseDto<Object>> searchSharepointGraphqlQuery(
+	public ResponseEntity<List<QueryResponse>> searchSharepointGraphqlQuery(
 			@RequestParam(required = true, name = "query") String queryText,
 			@RequestParam(required = true, name = "page", defaultValue = "1") int page,
 			@RequestParam(required = true, name = "size", defaultValue = "25") int size) throws FatalException {
 
-		if (StringUtils.isEmpty(queryText)) {
-			return new ResponseEntity<ResponseDto<Object>>(BoogleUtil.mapResponse(Constants.FAILURE,
-					Constants.QUERY_BLANK, env.getProperty("NOT_BLANK"), null), HttpStatus.BAD_REQUEST);
-		}
-
-		List<QueryResponse> searchResponse = sharepointSearchService.searchQueryUsingGraphql(queryText, page, size);
-		ResponseDto<Object> resp = BoogleUtil.mapResponse(Constants.SUCCESSFUL, null, null, searchResponse);
-		return new ResponseEntity<>(resp, HttpStatus.OK);
+		List<QueryResponse> queryResponses = sharepointSearchService.searchQueryUsingGraphql(queryText, page, size);
+		return new ResponseEntity<>(queryResponses, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "${boogle.confluence.search.url}")
-	public ResponseEntity<ResponseDto<Object>> searchConfluenceQuery(
+	public ResponseEntity<List<QueryResponse>> searchConfluenceQuery(
 			@RequestParam(required = true, name = "query") String queryText,
 			@RequestParam(required = true, name = "page", defaultValue = "1") int page,
 			@RequestParam(required = true, name = "size", defaultValue = "25") int size)
 			throws FatalException, BoogleException {
-		if (StringUtils.isEmpty(queryText)) {
-			return new ResponseEntity<ResponseDto<Object>>(BoogleUtil.mapResponse(Constants.FAILURE,
-					Constants.QUERY_BLANK, env.getProperty("NOT_BLANK"), null), HttpStatus.BAD_REQUEST);
-		}
-		List<QueryResponse> searchResponse = confluenceSearchService.searchConfluenceQuery(queryText, page, size);
-		ResponseDto<Object> resp = BoogleUtil.mapResponse(Constants.SUCCESSFUL, null, null, searchResponse);
-		return new ResponseEntity<>(resp, HttpStatus.OK);
+		List<QueryResponse> queryResponses = confluenceSearchService.searchConfluenceQuery(queryText, page, size);
+		return new ResponseEntity<>(queryResponses, HttpStatus.OK);
 	}
 
 }
