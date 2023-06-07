@@ -9,7 +9,11 @@ public class QueryResponse {
 	private String summary;
 	private String parentPageName;
 	private String parentPagePath;
+	private String lastModifiedDate;
 
+	public String getLastModifiedDate() {
+		return lastModifiedDate;
+	}
 	public String getTitle() {
 		return title;
 	}
@@ -56,6 +60,9 @@ public class QueryResponse {
 	
 	public void setParentPagePath(String parentPagePath) {
 		this.parentPagePath = parentPagePath;
+	}
+	public void setLastModifiedDate(String lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
 	}
 	
 	

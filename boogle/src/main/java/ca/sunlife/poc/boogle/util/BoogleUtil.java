@@ -1,10 +1,14 @@
 package ca.sunlife.poc.boogle.util;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import ca.sunlife.poc.boogle.constants.Constants;
 import ca.sunlife.poc.boogle.response.ErrorDetails;
 import ca.sunlife.poc.boogle.response.ResponseDto;
 
@@ -60,6 +64,18 @@ public class BoogleUtil {
 
 	public static String createUrl(String firstParameter, String secondParameter) {
 		return firstParameter + secondParameter;
+	}
+
+	public static String formatDate(String date) {
+		String formattedDate = "";
+		if (!StringUtils.isEmpty(date)) {
+			 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.LAST_MODIFIED_DATE_FORMAT);
+			DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
+
+			LocalDateTime parsedDateTime = LocalDateTime.parse(date, formatter);
+			formattedDate = parsedDateTime.format(outputFormatter);
+		}
+		return formattedDate;
 	}
 
 }

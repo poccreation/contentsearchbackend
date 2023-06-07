@@ -16,5 +16,7 @@ public interface Constants {
 	public final static String SLASH ="/";
 	public final static String ATTACHMENT="attachment";
 	public final static String DOT="[.]";
+	public final static String LAST_MODIFIED_DATE_FORMAT="yyyy-MM-dd'T'HH:mm:ss[.SSS]X";
+	
 
 }

@@ -1,3 +1,4 @@
+
 package ca.sunlife.poc.boogle.response.sharepoint;
 
 
@@ -6,6 +7,11 @@ public class Resource {
 	private String name;
 	private String webUrl;
 	private Fields fields;
+	private String lastModifiedDateTime;
+	
+	public String getLastModifiedDateTime() {
+		return lastModifiedDateTime;
+	}
 	public String getName() {
 		return name;
 	}
@@ -25,5 +31,8 @@ public class Resource {
 		this.fields = fields;
 	}
 	
+	public void setLastModifiedDateTime(String lastModifiedDateTime) {
+		this.lastModifiedDateTime = lastModifiedDateTime;
+	}
 
 }

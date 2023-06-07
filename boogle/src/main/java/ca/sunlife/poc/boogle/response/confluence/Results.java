@@ -20,6 +20,8 @@ public class Results {
 	   @JsonProperty("space")
 	   private Space space;
 	   
+	   @JsonProperty("version")
+	   private Version version;
 	   @JsonProperty("body")
 	   private Body body;
 	   @JsonProperty("_links")
@@ -67,5 +69,11 @@ public class Results {
 		this.links = links;
 	}
 
+	public Version getVersion() {
+		return version;
+	}
+	public void setVersion(Version version) {
+		this.version = version;
+	}
 	   
 }

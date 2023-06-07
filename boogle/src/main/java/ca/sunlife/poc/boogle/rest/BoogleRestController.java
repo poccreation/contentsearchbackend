@@ -2,25 +2,20 @@ package ca.sunlife.poc.boogle.rest;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ca.sunlife.poc.boogle.confluence.service.IConfluenceSearchService;
-import ca.sunlife.poc.boogle.constants.Constants;
 import ca.sunlife.poc.boogle.exception.BoogleException;
 import ca.sunlife.poc.boogle.exception.FatalException;
 import ca.sunlife.poc.boogle.response.QueryResponse;
-import ca.sunlife.poc.boogle.response.ResponseDto;
 import ca.sunlife.poc.boogle.sharepoint.service.ISharepointSearchService;
-import ca.sunlife.poc.boogle.util.BoogleUtil;
 
 @RestController
 @RequestMapping(value = "${boogle.base.url}")

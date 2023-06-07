@@ -89,6 +89,7 @@ public class SearchResponseMapper {
 		queryResponse.setParentPagePath(BoogleUtil.createUrl(links.getBase(), result.getSpace().getLinks().getWebui()));
 		queryResponse.setPath(BoogleUtil.createUrl(links.getBase(), result.getLinks().getWebui()));
 		queryResponse.setSummary(BoogleUtil.parseHtml(result.getBody().getView().getValue()));
+		queryResponse.setLastModifiedDate(BoogleUtil.formatDate(result.getVersion().getWhen()));
 		if (result.getType().equals(Constants.ATTACHMENT)) {
 			queryResponse.setDocument(true);
 			queryResponse.setFileType(BoogleUtil.getLastValue(result.getTitle(), Constants.DOT));
@@ -103,6 +104,7 @@ public class SearchResponseMapper {
 		Resource resource = hits.getResource();
 		Fields fields = resource.getFields();
 		queryResponse.setSummary(BoogleUtil.parseHtml(hits.getSummary()));
+		queryResponse.setLastModifiedDate(BoogleUtil.formatDate(hits.getResource().getLastModifiedDateTime()));
 		if (null != fields) {
 			queryResponse.setTitle(fields.getTitle());
 			queryResponse.setDocument(fields.getIsDocument());
