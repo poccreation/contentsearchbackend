@@ -1,3 +1,4 @@
+
 package ca.sunlife.poc.boogle.confluence.service;
 
 import java.text.MessageFormat;
@@ -45,6 +46,7 @@ public class ConfluenceSearchService implements IConfluenceSearchService {
 			throw new FatalException(env.getProperty("GENERIC_ERROR_MESSAGE"));
 		}
 		String formattedUri = MessageFormat.format(searchQueryUri, query, pageSize);
+		
 		BoogleUtil sunsearchUtil = new BoogleUtil();
 		WebClient webClient = sunsearchUtil.getWebClient(baseUrl);
 		ConfluenceResponse confluenceResponse = webClient.get().uri(formattedUri).accept(MediaType.APPLICATION_JSON)
