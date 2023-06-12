@@ -1,11 +1,9 @@
 package ca.sunlife.poc.boogle.confluence.service;
 
-import java.util.List;
-
-import ca.sunlife.poc.boogle.response.QueryResponse;
+import ca.sunlife.poc.boogle.response.SearchResponse;
 
 public interface IConfluenceSearchService {
 
-	public List<QueryResponse> searchConfluenceQuery(String query, int page, int pageSize);
+	public SearchResponse searchConfluenceQuery(String query, int page, int pageSize,String nextLink);
 
 }

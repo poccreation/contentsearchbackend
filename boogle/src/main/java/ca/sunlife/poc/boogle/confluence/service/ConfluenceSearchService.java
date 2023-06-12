@@ -18,6 +18,7 @@ import ca.sunlife.poc.boogle.constants.Constants;
 import ca.sunlife.poc.boogle.exception.BoogleException;
 import ca.sunlife.poc.boogle.exception.FatalException;
 import ca.sunlife.poc.boogle.response.QueryResponse;
+import ca.sunlife.poc.boogle.response.SearchResponse;
 import ca.sunlife.poc.boogle.response.confluence.ConfluenceResponse;
 import ca.sunlife.poc.boogle.util.BoogleUtil;
 import ca.sunlife.poc.boogle.util.SearchResponseMapper;
@@ -32,6 +33,9 @@ public class ConfluenceSearchService implements IConfluenceSearchService {
 	@Value("${confluence.rest.search.uri}")
 	String searchQueryUri;
 
+	@Value("${confluence.cloud.id}")
+	String cloudId;
+
 	@Autowired
 	Environment env;
 
@@ -39,14 +43,19 @@ public class ConfluenceSearchService implements IConfluenceSearchService {
 	IConfluenceAuthService confluenceAuthService;
 
 	@Override
-	public List<QueryResponse> searchConfluenceQuery(String query, int page, int pageSize) {
+	public SearchResponse searchConfluenceQuery(String query, int page, int pageSize, String nextLink) {
 
 		String accessToken = confluenceAuthService.fetchOAuthToken().getAccess_token();
 		if (StringUtils.isEmpty(accessToken)) {
 			throw new FatalException(env.getProperty("GENERIC_ERROR_MESSAGE"));
 		}
 		String formattedUri = MessageFormat.format(searchQueryUri, query, pageSize);
-		
+		if (!StringUtils.isEmpty(nextLink)) {
+			StringBuffer buffer = new StringBuffer();
+			buffer.append("/ex/confluence/").append(cloudId).append(nextLink);
+			formattedUri = buffer.toString();
+		}
+
 		BoogleUtil sunsearchUtil = new BoogleUtil();
 		WebClient webClient = sunsearchUtil.getWebClient(baseUrl);
 		ConfluenceResponse confluenceResponse = webClient.get().uri(formattedUri).accept(MediaType.APPLICATION_JSON)
@@ -59,9 +68,13 @@ public class ConfluenceSearchService implements IConfluenceSearchService {
 		if (CollectionUtils.isEmpty(confluenceResponse.getResults())) {
 			throw new BoogleException(env.getProperty("NO_RECORD"), Constants.NO_RECORD_FOUND);
 		}
-		List<QueryResponse> queryResponses = SearchResponseMapper.mapConfluenceResponse(confluenceResponse);
 
-		return queryResponses;
+		List<QueryResponse> queryResponses = SearchResponseMapper.mapConfluenceResponse(confluenceResponse);
+		SearchResponse searchResponse = new SearchResponse();
+
+		searchResponse.setNext(confluenceResponse.getLinks().getNext());
+		searchResponse.setQueryResponses(queryResponses);
+		return searchResponse;
 
 	}
 

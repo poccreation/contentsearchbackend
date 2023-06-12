@@ -16,6 +16,7 @@ import ca.sunlife.poc.boogle.confluence.service.IConfluenceSearchService;
 import ca.sunlife.poc.boogle.exception.BoogleException;
 import ca.sunlife.poc.boogle.exception.FatalException;
 import ca.sunlife.poc.boogle.response.QueryResponse;
+import ca.sunlife.poc.boogle.response.SearchResponse;
 import ca.sunlife.poc.boogle.sharepoint.service.ISharepointSearchService;
 
 @RestController
@@ -53,13 +54,12 @@ public class BoogleRestController {
 	}
 
 	@GetMapping(value = "${boogle.confluence.search.url}")
-	public ResponseEntity<List<QueryResponse>> searchConfluenceQuery(
+	public ResponseEntity<SearchResponse> searchConfluenceQuery(
 			@RequestParam(required = true, name = "query") String queryText,
 			@RequestParam(required = true, name = "page", defaultValue = "1") int page,
-			@RequestParam(required = true, name = "size", defaultValue = "25") int size)
+			@RequestParam(required = true, name = "size", defaultValue = "25") int size,@RequestParam(required = false, name = "nextLink") String nextLink)
 			throws FatalException, BoogleException {
-		List<QueryResponse> queryResponses = confluenceSearchService.searchConfluenceQuery(queryText, page, size);
-		return new ResponseEntity<>(queryResponses, HttpStatus.OK);
+		SearchResponse searchResponse = confluenceSearchService.searchConfluenceQuery(queryText, page, size,nextLink);
+		return new ResponseEntity<>(searchResponse, HttpStatus.OK);
 	}
-
 }
