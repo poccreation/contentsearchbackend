@@ -52,7 +52,7 @@ public class ConfluenceSearchService implements IConfluenceSearchService {
 		String formattedUri = MessageFormat.format(searchQueryUri, query, pageSize);
 		if (!StringUtils.isEmpty(nextLink)) {
 			StringBuffer buffer = new StringBuffer();
-			buffer.append("/ex/confluence/").append(cloudId).append(nextLink);
+			buffer.append("/ex/confluence/").append(cloudId).append(BoogleUtil.decodeValue(nextLink));
 			formattedUri = buffer.toString();
 		}
 

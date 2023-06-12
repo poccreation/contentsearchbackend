@@ -1,5 +1,8 @@
 package ca.sunlife.poc.boogle.util;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -69,13 +72,21 @@ public class BoogleUtil {
 	public static String formatDate(String date) {
 		String formattedDate = "";
 		if (!StringUtils.isEmpty(date)) {
-			 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.LAST_MODIFIED_DATE_FORMAT);
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.LAST_MODIFIED_DATE_FORMAT);
 			DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy");
 
 			LocalDateTime parsedDateTime = LocalDateTime.parse(date, formatter);
 			formattedDate = parsedDateTime.format(outputFormatter);
 		}
 		return formattedDate;
+	}
+
+	public static String decodeValue(String value) {
+		try {
+			return URLDecoder.decode(value, StandardCharsets.UTF_8.toString());
+		} catch (UnsupportedEncodingException ex) {
+			throw new RuntimeException(ex.getCause());
+		}
 	}
 
 }

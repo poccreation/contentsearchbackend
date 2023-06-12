@@ -44,22 +44,30 @@ public class BoogleRestController {
 	}
 
 	@GetMapping(value = "${boogle.sharepoint.graphql.search.url}")
-	public ResponseEntity<List<QueryResponse>> searchSharepointGraphqlQuery(
+	public ResponseEntity<SearchResponse> searchSharepointGraphqlQuery(
 			@RequestParam(required = true, name = "query") String queryText,
 			@RequestParam(required = true, name = "page", defaultValue = "1") int page,
 			@RequestParam(required = true, name = "size", defaultValue = "25") int size) throws FatalException {
 
-		List<QueryResponse> queryResponses = sharepointSearchService.searchQueryUsingGraphql(queryText, page, size);
-		return new ResponseEntity<>(queryResponses, HttpStatus.OK);
+		SearchResponse searchResponse = sharepointSearchService.searchQueryUsingGraphql(queryText, page, size);
+		return new ResponseEntity<>(searchResponse, HttpStatus.OK);
 	}
+
+//	@PostMapping(value = "${boogle.confluence.search.url}")
+//	public ResponseEntity<SearchResponse> searchConfluenceQuery(@RequestBody SearchRequest searchRequest)
+//			throws FatalException, BoogleException {
+//		SearchResponse searchResponse = confluenceSearchService.searchConfluenceQuery(searchRequest.getSearchQuery(), searchRequest.getPage(), searchRequest.getSize(),searchRequest.getNextLink());
+//		return new ResponseEntity<>(searchResponse, HttpStatus.OK);
+//	}
 
 	@GetMapping(value = "${boogle.confluence.search.url}")
 	public ResponseEntity<SearchResponse> searchConfluenceQuery(
 			@RequestParam(required = true, name = "query") String queryText,
 			@RequestParam(required = true, name = "page", defaultValue = "1") int page,
-			@RequestParam(required = true, name = "size", defaultValue = "25") int size,@RequestParam(required = false, name = "nextLink") String nextLink)
+			@RequestParam(required = true, name = "size", defaultValue = "25") int size,@RequestParam(required = false, name = "nextLink") String nextLink )
 			throws FatalException, BoogleException {
-		SearchResponse searchResponse = confluenceSearchService.searchConfluenceQuery(queryText, page, size,nextLink);
+		SearchResponse searchResponse = confluenceSearchService.searchConfluenceQuery(queryText,
+				page, size, nextLink);
 		return new ResponseEntity<>(searchResponse, HttpStatus.OK);
 	}
 }

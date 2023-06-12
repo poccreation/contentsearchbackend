@@ -17,6 +17,7 @@ import ca.sunlife.poc.boogle.constants.Constants;
 import ca.sunlife.poc.boogle.exception.BoogleException;
 import ca.sunlife.poc.boogle.exception.FatalException;
 import ca.sunlife.poc.boogle.response.QueryResponse;
+import ca.sunlife.poc.boogle.response.SearchResponse;
 import ca.sunlife.poc.boogle.response.sharepoint.GraphqlResponse;
 import ca.sunlife.poc.boogle.response.sharepoint.SharepointResponse;
 import ca.sunlife.poc.boogle.sharepoint.request.GraphqlRequest;
@@ -88,7 +89,7 @@ public class SharepointSearchService implements ISharepointSearchService {
 	}
 
 	@Override
-	public List<QueryResponse> searchQueryUsingGraphql(String query, int page, int pageSize) {
+	public SearchResponse searchQueryUsingGraphql(String query, int page, int pageSize) {
 		String accessToken = sharepointAuthService.fetchOAuthTokenByClientCredentials().getAccess_token();
 		if (StringUtils.isEmpty(accessToken)) {
 			throw new FatalException(env.getProperty("GENERIC_ERROR_MESSAGE"));
@@ -108,7 +109,10 @@ public class SharepointSearchService implements ISharepointSearchService {
 
 			throw new BoogleException(env.getProperty("NO_RECORD"), Constants.NO_RECORD_FOUND);
 		}
-		return queryResponses;
+		SearchResponse searchResponse =  new SearchResponse();
+		searchResponse.setQueryResponses(queryResponses);
+		
+		return searchResponse;
 
 	}
 
