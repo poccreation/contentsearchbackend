@@ -1,39 +1,36 @@
+
 package ca.sunlife.poc.boogle.rest;
 
-import java.util.ArrayList;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import ca.sunlife.poc.boogle.exception.BoogleException;
+import ca.sunlife.poc.boogle.constants.Constants;
 import ca.sunlife.poc.boogle.exception.FatalException;
+import ca.sunlife.poc.boogle.util.BoogleUtil;
 
 @ControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler {
 
+	@Value("${BAD_REQUEST_MSG}")
+	String msg;
+
 	@ExceptionHandler({ Exception.class, FatalException.class })
 	public ResponseEntity<Object> defaultExceptionHandler(final Exception exp) {
-
-		return new ResponseEntity<Object>(exp.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-
-	}
-
-	@ExceptionHandler({ BoogleException.class })
-	public ResponseEntity<Object> businessExceptionHandler(final BoogleException exp) {
-		return new ResponseEntity<Object>(new ArrayList<>(), HttpStatus.OK);
+		return new ResponseEntity<Object>(BoogleUtil.mapErrorResponse(exp.getMessage(),Constants.INTERNAL_SERVER_ERROR_CODE),
+				HttpStatus.INTERNAL_SERVER_ERROR);
 
 	}
-	
-	@ExceptionHandler({ MethodArgumentNotValidException.class,HttpMessageNotReadableException.class })
+
+	@ExceptionHandler({ MethodArgumentNotValidException.class })
 	public ResponseEntity<Object> meessageNotReadableExceptionHandler() {
-		return new ResponseEntity<Object>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<Object>(BoogleUtil.mapErrorResponse(msg,Constants.BAD_REQUEST_ERROR_CODE), HttpStatus.BAD_REQUEST);
 
 	}
 }

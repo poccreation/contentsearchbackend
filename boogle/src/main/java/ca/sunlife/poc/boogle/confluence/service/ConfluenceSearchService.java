@@ -7,15 +7,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import ca.sunlife.poc.boogle.constants.Constants;
-import ca.sunlife.poc.boogle.exception.BoogleException;
 import ca.sunlife.poc.boogle.exception.FatalException;
 import ca.sunlife.poc.boogle.response.QueryResponse;
 import ca.sunlife.poc.boogle.response.SearchResponse;
@@ -37,17 +33,23 @@ public class ConfluenceSearchService implements IConfluenceSearchService {
 	String cloudId;
 
 	@Autowired
-	Environment env;
-
-	@Autowired
 	IConfluenceAuthService confluenceAuthService;
+	
+	@Autowired
+	WebClient webClient;
 
+	@Value("${GENERIC_ERROR_MESSAGE}")
+	String msg;
+	
+	
 	@Override
 	public SearchResponse searchConfluenceQuery(String query, int page, int pageSize, String nextLink) {
 
+		System.out.println(msg);
+		
 		String accessToken = confluenceAuthService.fetchOAuthToken().getAccess_token();
 		if (StringUtils.isEmpty(accessToken)) {
-			throw new FatalException(env.getProperty("GENERIC_ERROR_MESSAGE"));
+			throw new FatalException(msg);
 		}
 		String formattedUri = MessageFormat.format(searchQueryUri, query, pageSize);
 		if (!StringUtils.isEmpty(nextLink)) {
@@ -56,18 +58,12 @@ public class ConfluenceSearchService implements IConfluenceSearchService {
 			formattedUri = buffer.toString();
 		}
 
-		BoogleUtil sunsearchUtil = new BoogleUtil();
-		WebClient webClient = sunsearchUtil.getWebClient(baseUrl);
-		ConfluenceResponse confluenceResponse = webClient.get().uri(formattedUri).accept(MediaType.APPLICATION_JSON)
+		ConfluenceResponse confluenceResponse = webClient.get().uri(baseUrl+formattedUri).accept(MediaType.APPLICATION_JSON)
 				.headers(headers -> headers.setBearerAuth(accessToken)).retrieve()
 				.onStatus(HttpStatus::is4xxClientError,
-						resp -> Mono.error(new FatalException(env.getProperty("GENERIC_ERROR_MESSAGE"))))
-				.onStatus(HttpStatus::is5xxServerError, resp -> Mono.error(new FatalException("GENERIC_ERROR_MESSAGE")))
+						resp -> Mono.error(new FatalException(msg)))
+				.onStatus(HttpStatus::is5xxServerError, resp -> Mono.error(new FatalException(msg)))
 				.bodyToMono(ConfluenceResponse.class).block();
-
-		if (CollectionUtils.isEmpty(confluenceResponse.getResults())) {
-			throw new BoogleException(env.getProperty("NO_RECORD"), Constants.NO_RECORD_FOUND);
-		}
 
 		List<QueryResponse> queryResponses = SearchResponseMapper.mapConfluenceResponse(confluenceResponse);
 		SearchResponse searchResponse = new SearchResponse();

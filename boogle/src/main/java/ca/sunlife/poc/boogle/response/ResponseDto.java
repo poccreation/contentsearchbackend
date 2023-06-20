@@ -4,7 +4,7 @@ public class ResponseDto<T> {
 
 	private T response;
 	private String status;
-	private ErrorDetails errorDetails;
+	private ErrorResponse errorDetails;
 
 	public void setResponse(T response) {
 		this.response = response;
@@ -18,11 +18,11 @@ public class ResponseDto<T> {
 		this.status = status;
 	}
 
-	public void setErrorDetails(ErrorDetails errorDetails) {
+	public void setErrorDetails(ErrorResponse errorDetails) {
 		this.errorDetails = errorDetails;
 	}
 
-	public ErrorDetails getErrorDetails() {
+	public ErrorResponse getErrorDetails() {
 		return errorDetails;
 	}
 

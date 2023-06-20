@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,7 +26,6 @@ import com.microsoft.aad.msal4j.SilentParameters;
 
 import ca.sunlife.poc.boogle.exception.FatalException;
 import ca.sunlife.poc.boogle.response.AccessTokenResponse;
-import ca.sunlife.poc.boogle.util.BoogleUtil;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -59,6 +59,10 @@ public class SharepointAuthService implements ISharepointAuthService {
 	String clientSecret;
 	@Value("${sharepoint.graphql.scope}")
 	String scope;
+	
+	@Autowired
+	WebClient webClient;
+	
 
 	IAuthenticationResult result;
 	ConfidentialClientApplication confidentialClientApplication;
@@ -109,11 +113,8 @@ public class SharepointAuthService implements ISharepointAuthService {
 		bodyMap.add("grant_type", grantType);
 		bodyMap.add("client_secret", clientSecret);
 		bodyMap.add("scope", scope);
-		
-		BoogleUtil sunsearchUtil = new BoogleUtil();
-		WebClient webClient = sunsearchUtil.getWebClient(SHAREPOINT_OAUTH_URL);
 		AccessTokenResponse accessTokenResponse = webClient.post()
-			    .uri(tokenUri)
+			    .uri(SHAREPOINT_OAUTH_URL+tokenUri)
 			    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
 			    .accept(MediaType.APPLICATION_JSON)
 			    .body(BodyInserters.fromFormData(bodyMap))

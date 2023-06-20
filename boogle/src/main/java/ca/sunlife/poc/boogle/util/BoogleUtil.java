@@ -9,32 +9,17 @@ import java.time.format.DateTimeFormatter;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import ca.sunlife.poc.boogle.constants.Constants;
-import ca.sunlife.poc.boogle.response.ErrorDetails;
-import ca.sunlife.poc.boogle.response.ResponseDto;
+import ca.sunlife.poc.boogle.response.ErrorResponse;
 
 public class BoogleUtil {
 
-	public static ResponseDto<Object> mapResponse(String status, String errorCode, String errorMessage,
-			Object responseDetails) {
-		ResponseDto<Object> resp = new ResponseDto<>();
-		resp.setStatus(status);
-		resp.setResponse(responseDetails);
-		if (!StringUtils.isEmpty(errorCode)) {
-			ErrorDetails errorDetails = new ErrorDetails();
-			errorDetails.setErrorCode(errorCode);
-			errorDetails.setErrorDescription(errorMessage);
-			resp.setErrorDetails(errorDetails);
-		}
-		return resp;
-
-	}
-
-	public WebClient getWebClient(String baseUrl) {
-		WebClient webClient = WebClient.builder().baseUrl(baseUrl).build();
-		return webClient;
+	public static ErrorResponse mapErrorResponse(String message, String code) {
+		ErrorResponse errorResponse = new ErrorResponse();
+		errorResponse.setMessage(message);
+		errorResponse.setCode(code);
+		return errorResponse;
 	}
 
 	public static int calculateStartRow(int pageNumber, int pageSize) {
