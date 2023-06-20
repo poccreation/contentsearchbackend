@@ -45,7 +45,6 @@ public class ConfluenceSearchService implements IConfluenceSearchService {
 	@Override
 	public SearchResponse searchConfluenceQuery(String query, int page, int pageSize, String nextLink) {
 
-		System.out.println(msg);
 		
 		String accessToken = confluenceAuthService.fetchOAuthToken().getAccess_token();
 		if (StringUtils.isEmpty(accessToken)) {
