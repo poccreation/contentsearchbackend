@@ -54,7 +54,6 @@ public class SharepointSearchService implements ISharepointSearchService {
 
 	@Autowired
 	WebClient webClient;
-	
 
 	@Value("${GENERIC_ERROR_MESSAGE}")
 	String msg;
@@ -68,14 +67,15 @@ public class SharepointSearchService implements ISharepointSearchService {
 		}
 		String formattedUri = MessageFormat.format(searchQueryUri, query, BoogleUtil.calculateStartRow(page, pageSize),
 				pageSize);
-		SharepointResponse sharepointResponse = webClient.get().uri(baseUrl + formattedUri)
-				.header("Accept", sharepointHeader).headers(headers -> headers.setBearerAuth(accessToken)).retrieve()
-				.onStatus(HttpStatus::is4xxClientError,
-						resp -> Mono.error(new FatalException(msg)))
+		SharepointResponse sharepointResponse = new SharepointResponse();
+		String sr = webClient.get().uri(baseUrl + formattedUri).header("Accept", sharepointHeader)
+				.headers(headers -> headers.setBearerAuth(accessToken)).retrieve()
+				.onStatus(HttpStatus::is4xxClientError, resp -> Mono.error(new FatalException(msg)))
 				.onStatus(HttpStatus::is5xxServerError, resp -> Mono.error(new FatalException("GENERIC_ERROR_MESSAGE")))
-				.bodyToMono(SharepointResponse.class).block();
+				.bodyToMono(String.class).block();
 
-		
+		System.out.println(sr);
+
 		List<QueryResponse> queryResponses = SearchResponseMapper.mapSharepointResponse(sharepointResponse);
 		return queryResponses;
 
@@ -87,11 +87,11 @@ public class SharepointSearchService implements ISharepointSearchService {
 		if (StringUtils.isEmpty(accessToken)) {
 			throw new FatalException(msg);
 		}
-		GraphqlResponse graphqlResponse = webClient.post().uri(graphqlSearchUrl+graphSearchUri).contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON).headers(headers -> headers.setBearerAuth(accessToken))
+		GraphqlResponse graphqlResponse = webClient.post().uri(graphqlSearchUrl + graphSearchUri)
+				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+				.headers(headers -> headers.setBearerAuth(accessToken))
 				.body(Mono.just(setRequest(query, page, pageSize)), GraphqlRequest.class).retrieve()
-				.onStatus(HttpStatus::is4xxClientError,
-						resp -> Mono.error(new FatalException(msg)))
+				.onStatus(HttpStatus::is4xxClientError, resp -> Mono.error(new FatalException(msg)))
 				.onStatus(HttpStatus::is5xxServerError, resp -> Mono.error(new FatalException("GENERIC_ERROR_MESSAGE")))
 				.bodyToMono(GraphqlResponse.class).block();
 		List<QueryResponse> queryResponses = SearchResponseMapper.mapGraphqlResponse(graphqlResponse);
@@ -104,6 +104,13 @@ public class SharepointSearchService implements ISharepointSearchService {
 
 	private GraphqlRequest setRequest(String query, int page, int pageSize) {
 		GraphqlRequest graphqlRequest = new GraphqlRequest();
+		
+		// Escape the double quotes
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("'");
+		stringBuilder.append(query);
+		stringBuilder.append("'");
+		
 		Requests requests = new Requests();
 		requests.setSize(pageSize);
 		requests.setFrom(BoogleUtil.calculateStartRow(page, pageSize));
@@ -111,7 +118,7 @@ public class SharepointSearchService implements ISharepointSearchService {
 		requests.setRegion(region);
 		requests.setFields(fields);
 		Query queryObj = new Query();
-		queryObj.setQueryString(query);
+		queryObj.setQueryString(stringBuilder.toString());
 		requests.setQuery(queryObj);
 		graphqlRequest.getRequests().add(requests);
 
